@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Birthday Presentation - Cute Dancing Cats & Egg Surprise!</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
+</head>
+<body>
+  <!-- Ambient background glow orbs -->
+  <div class="bg-ambient">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <div id="app-container">
+    <!-- Header -->
+    <header>
+      <div class="brand" onclick="window.location.reload()">
+        <span class="brand-icon">🐱</span>
+        <span>MeowParty 3D</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-load-sample" class="btn btn-secondary" title="Load sample birthday details">
+          🎲 Load Demo Party
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW 1: Birthday Setup Form -->
+    <main id="creator-view" class="view-section active">
+      <div class="creator-container">
+        <div class="hero-text">
+          <h1>3D Birthday Bash! 🎉</h1>
+          <p>Create a hilarious, cute 3D party with dancing cats, a 3D cake, and an interactive egg-smashing surprise!</p>
+        </div>
+
+        <div class="glass-card">
+          <form id="birthday-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-sender">💌 Your Name (Sender)</label>
+                <input type="text" id="input-sender" placeholder="e.g. Your Best Friend, Jessica..." required>
+              </div>
+
+              <div class="form-group">
+                <label for="input-birthday-person">👑 Birthday Person's Name</label>
+                <input type="text" id="input-birthday-person" placeholder="e.g. Alex, Sam, Grandma..." required>
+              </div>
+
+              <div class="form-group">
+                <label for="input-age">🎂 Turning Age (Optional)</label>
+                <input type="number" id="input-age" placeholder="e.g. 21, 25, 30..." min="1" max="150">
+              </div>
+
+              <div class="form-group">
+                <label for="select-cat-dance">🐾 Cat Dance Style</label>
+                <select id="select-cat-dance">
+                  <option value="disco">🕺 Disco Paw Shake</option>
+                  <option value="wobble">🤪 Silly Kitty Wiggle</option>
+                  <option value="hop">🦘 High-Energy Cat Hop</option>
+                </select>
+              </div>
+
+              <!-- Photo Upload Zone -->
+              <div class="form-group full-width">
+                <label>📸 Upload Photos of the Birthday Person</label>
+                <div class="upload-zone" id="upload-zone">
+                  <input type="file" id="photo-input" accept="image/*" multiple>
+                  <div class="upload-icon">🎈</div>
+                  <div class="upload-text">Click or drag & drop photos here</div>
+                  <div class="upload-hint">Upload 1 to 6 photos. Tap any uploaded photo to set it as the funny Egg Break Photo!</div>
+                </div>
+                <div class="preview-grid" id="preview-grid"></div>
+              </div>
+
+              <!-- Message -->
+              <div class="form-group full-width">
+                <label for="input-message">💬 Personal Birthday Wish</label>
+                <textarea id="input-message" rows="3" placeholder="Write your heartfelt or funny birthday message here..."></textarea>
+              </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 1rem;">
+              <button type="submit" class="btn btn-primary" style="font-size: 1.25rem; padding: 1rem 2.8rem;">
+                🚀 Launch 3D Birthday Presentation!
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- MAIN VIEW 2: 3D Presentation Stage -->
+    <div id="presentation-view" class="view-section">
+      <!-- 3D WebGL Canvas Container -->
+      <div id="canvas3d-container"></div>
+
+      <!-- Presentation HUD Overlays -->
+      <div class="presentation-hud">
+        <!-- Top HUD -->
+        <div class="hud-top">
+          <div class="bday-title-card">
+            <h2 id="hud-bday-name">Happy Birthday! 🎉</h2>
+            <p id="hud-bday-sub">Celebrating with cute dancing cats & cake!</p>
+          </div>
+          <div class="hud-controls-top">
+            <button id="btn-back-to-edit" class="btn btn-secondary">
+              ✏️ Edit Details
+            </button>
+          </div>
+        </div>
+
+        <!-- Center Message Bubble -->
+        <div class="hud-center">
+          <div id="presentation-message-bubble" class="message-bubble">
+            <p id="hud-bday-msg">Wishing you the best birthday ever!</p>
+            <div id="hud-bday-sender" style="margin-top: 0.6rem; font-size: 1rem; color: var(--primary);"></div>
+          </div>
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="hud-bottom">
+          <button id="btn-toggle-music" class="action-pill">
+            🎵 Play Music
+          </button>
+          <button id="btn-change-dance" class="action-pill">
+            🐱 Style: DISCO
+          </button>
+          <button id="btn-blow-candles" class="action-pill">
+            🎂 Blow Candles
+          </button>
+          <button id="btn-smash-egg" class="action-pill btn-egg">
+            🥚 Smash The Birthday Egg!
+          </button>
+          <button id="btn-show-message" class="action-pill">
+            💌 Show Wish
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 1: The Funny Egg Break Experience -->
+    <div id="egg-break-overlay">
+      <!-- Interactive Wobble & Tap Stage -->
+      <div id="egg-stage-interactive" class="egg-stage">
+        <div id="egg-container" class="egg-container">
+          <div class="egg-body">
+            <!-- Funny Eyes & Face -->
+            <div class="egg-face">
+              <div class="egg-eye">
+                <div class="egg-pupil"></div>
+              </div>
+              <div class="egg-eye">
+                <div class="egg-pupil"></div>
+              </div>
+            </div>
+            <div class="egg-mouth"></div>
+
+            <!-- SVG Cracks -->
+            <svg class="crack-line crack-1" style="top: 20%; left: 35%; width: 90px; height: 100px;">
+              <path d="M 20 10 L 45 40 L 35 65 L 70 90" />
+            </svg>
+            <svg class="crack-line crack-2" style="top: 35%; right: 20%; width: 100px; height: 110px;">
+              <path d="M 60 10 L 30 45 L 55 75 L 20 105" />
+            </svg>
+            <svg class="crack-line crack-3" style="bottom: 15%; left: 25%; width: 120px; height: 80px;">
+              <path d="M 10 40 L 50 20 L 80 55 L 110 30" />
+            </svg>
+          </div>
+        </div>
+
+        <div id="egg-speech" class="egg-speech">
+          I am a very fragile birthday egg... Please DO NOT touch me! 🥺
+        </div>
+        <div class="egg-subtext">👉 Tap the egg to see what happens!</div>
+      </div>
+
+      <!-- Exploded / Sunny-Side-Up Photo Reveal Card -->
+      <div id="egg-reveal-card" class="egg-reveal-card">
+        <div class="sunny-egg-frame">
+          <span class="egg-hat">👑</span>
+          <img id="egg-revealed-img" class="revealed-photo" src="" alt="Birthday Star" />
+        </div>
+        <div class="egg-splat-caption">
+          <h3 id="egg-revealed-name">Happy Birthday! 🎉</h3>
+          <p id="egg-revealed-subtext">You are officially EGG-CELLENT and certified 100% Grade-A Birthday Royalty!</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <button id="btn-egg-again" class="btn btn-secondary egg-close-btn">
+            🔁 Smash Again
+          </button>
+          <button id="btn-egg-close" class="btn btn-primary egg-close-btn">
+            ✨ Back to Party!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: Secret Admin Portal (Passcode 4505) -->
+    <div id="admin-modal">
+      <div class="admin-card">
+        <div class="admin-header">
+          <h3>🔒 Secret Admin Access</h3>
+          <button id="btn-admin-close" class="btn btn-icon-only btn-secondary" style="font-size: 1.4rem;">&times;</button>
+        </div>
+
+        <div class="admin-body">
+          <!-- Screen A: PIN Keypad -->
+          <div id="admin-pin-view" class="pin-view">
+            <p style="color: var(--text-muted); font-size: 1.1rem;">Enter the 4-digit secret administrator passcode:</p>
+            <div id="pin-display" class="pin-display">
+              <div class="pin-dot"></div>
+              <div class="pin-dot"></div>
+              <div class="pin-dot"></div>
+              <div class="pin-dot"></div>
+            </div>
+
+            <div class="keypad-grid">
+              <button class="key-btn" data-val="1">1</button>
+              <button class="key-btn" data-val="2">2</button>
+              <button class="key-btn" data-val="3">3</button>
+              <button class="key-btn" data-val="4">4</button>
+              <button class="key-btn" data-val="5">5</button>
+              <button class="key-btn" data-val="6">6</button>
+              <button class="key-btn" data-val="7">7</button>
+              <button class="key-btn" data-val="8">8</button>
+              <button class="key-btn" data-val="9">9</button>
+              <button class="key-btn" data-val="clear" style="font-size: 1.1rem; color: #ff9999;">C</button>
+              <button class="key-btn" data-val="0">0</button>
+              <button class="key-btn" data-val="backspace" style="font-size: 1.2rem;">⌫</button>
+            </div>
+
+            <div id="pin-error-msg" class="pin-error-msg"></div>
+          </div>
+
+          <!-- Screen B: Admin Dashboard -->
+          <div id="admin-dashboard-view" class="dashboard-view">
+            <!-- Stats -->
+            <div class="dashboard-stats">
+              <div class="stat-box">
+                <div id="stat-total-submissions" class="stat-number">0</div>
+                <div class="stat-label">Total Submissions</div>
+              </div>
+              <div class="stat-box">
+                <div id="stat-total-photos" class="stat-number">0</div>
+                <div class="stat-label">Uploaded Photos</div>
+              </div>
+            </div>
+
+            <!-- Submissions Table -->
+            <h4 style="color:#fff; font-size:1.15rem; margin-bottom: 0.6rem;">📋 User Details & Submissions</h4>
+            <div class="submissions-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Birthday Person</th>
+                    <th>Sender Name</th>
+                    <th>Photos</th>
+                    <th>Message</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-table-body"></tbody>
+              </table>
+            </div>
+
+            <!-- Gallery -->
+            <h4 class="admin-gallery-title">🖼️ Uploaded Photos Vault</h4>
+            <div id="admin-gallery-grid" class="admin-gallery-grid"></div>
+
+            <!-- Actions Bar -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+              <button id="btn-admin-export" class="btn btn-secondary">
+                📥 Export Submissions (JSON)
+              </button>
+              <button id="btn-admin-clear-all" class="btn btn-secondary" style="background:rgba(255,50,50,0.18); border-color:rgba(255,50,50,0.4); color:#ff9999;">
+                🗑️ Clear All Records
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer with Discrete Admin Trigger -->
+    <footer>
+      <p>
+        MeowParty 3D &bull; Made with 
+        <!-- Discrete Admin Trigger: Subtle paw icon in footer, triple-click or Ctrl+Shift+A -->
+        <span id="discrete-admin-trigger" class="discrete-admin-trigger" title="Paw of Wonder">🐾</span> 
+        for magical birthday celebrations &bull; © 2026
+      </p>
+    </footer>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast-msg"></div>
+
+  <!-- Dependencies: Three.js and Canvas Confetti -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Offline Confetti Fallback in case CDN is unreachable -->
+  <script>
+    if (!window.confetti) {
+      window.confetti = function(options) {
+        options = options || {};
+        const count = options.particleCount || 60;
+        const colors = options.colors || ['#ff4d8d', '#ffc75f', '#00c9a7', '#845ec2', '#ffffff'];
+        for (let i = 0; i < count; i++) {
+          const div = document.createElement('div');
+          div.style.position = 'fixed';
+          div.style.left = (Math.random() * 100) + 'vw';
+          div.style.top = '-20px';
+          div.style.width = (Math.random() * 8 + 6) + 'px';
+          div.style.height = (Math.random() * 12 + 8) + 'px';
+          div.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          div.style.borderRadius = '3px';
+          div.style.zIndex = '9999';
+          div.style.pointerEvents = 'none';
+          div.style.transform = `rotate(${Math.random() * 360}deg)`;
+          div.style.transition = `all ${Math.random() * 1.5 + 1.2}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+          document.body.appendChild(div);
+          setTimeout(() => {
+            div.style.top = '105vh';
+            div.style.transform = `rotate(${Math.random() * 720}deg) scale(0.6)`;
+            div.style.opacity = '0';
+          }, 20);
+          setTimeout(() => div.remove(), 3000);
+        }
+      };
+    }
+  </script>
+
+  <!-- Application Logic -->
+  <script src="js/audio.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/scene3d.js"></script>
+  <script src="js/eggBreak.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
